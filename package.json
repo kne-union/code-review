@@ -74,7 +74,8 @@
   "peerDependencies": {
     "antd": ">=5",
     "react": "*",
-    "react-dom": "*"
+    "react-dom": "*",
+    "react-virtuoso": ">=4"
   },
   "devDependencies": {
     "@kne/microbundle": "^0.15.5",
@@ -88,7 +89,7 @@
     "react-dom": "^18.2.0"
   },
   "dependencies": {
-    "@kne/file-system-view": "^1.0.0",
+    "@kne/file-system-view": "^1.0.1",
     "@kne/react-fetch": "^1.5.5",
     "@kne/react-file": "^0.1.35",
     "@kne/react-intl": "^0.1.9",

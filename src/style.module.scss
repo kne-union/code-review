@@ -35,9 +35,13 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 
-  > pre {
-    padding: 12px !important;
+  pre {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #ffffff !important;
   }
 }
 
@@ -49,14 +53,35 @@
 }
 
 .highlighter {
-  flex: 1;
-  border-radius: 0;
-  margin: 0;
-  padding: 0;
+  width: 100%;
 
   :global(pre) {
     margin: 0 !important;
     border-radius: 0 !important;
+    background: #ffffff !important;
+  }
+
+  :global(.linenumber) {
+    display: inline-block !important;
+    min-width: var(--line-number-width, 50px) !important;
+    width: var(--line-number-width, 50px) !important;
+    padding: 0 16px !important;
+    margin-right: 1em !important;
+    text-align: right !important;
+    color: #8c959f !important;
+    background: #fafbfc !important;
+    border-right: 1px solid #e1e4e8 !important;
+    user-select: none !important;
+    font-style: normal !important;
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace !important;
+    font-size: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  :global(.line) {
+    padding-left: 20px !important;
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace !important;
+    font-size: 13px !important;
   }
 }
 
@@ -64,4 +89,40 @@
   flex: 1;
   overflow: auto;
   padding: 16px;
+}
+
+.codeContainer {
+  height: 100%;
+  overflow: auto;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono', 'Source Code Pro', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  background: #ffffff;
+}
+
+.codeRow {
+  display: flex;
+  min-height: 21px;
+
+  &:hover {
+    background: #f5f5f5;
+  }
+}
+
+.lineNumber {
+  min-width: 50px;
+  padding: 0 12px;
+  text-align: right;
+  color: #999;
+  background: #fafafa;
+  border-right: 1px solid #e8e8e8;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.lineContent {
+  flex: 1;
+  padding: 0 12px;
+  white-space: pre;
+  overflow-x: auto;
 }

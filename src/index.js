@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { useIntl } from '@kne/react-intl';
 import withLocale from './withLocale';
 import { Splitter, Empty, Spin, Flex } from 'antd';
@@ -7,10 +7,14 @@ import Fetch from '@kne/react-fetch';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { vs } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { FilePreview } from '@kne/react-file';
+import { Virtuoso } from 'react-virtuoso';
+import '@kne/react-file/dist/index.css';
+import '@kne/file-system-view/dist/index.css';
 import style from './style.module.scss';
 
 const TEXT_EXTENSIONS = new Set([
   'js',
+  'mjs',
   'jsx',
   'ts',
   'tsx',
@@ -62,6 +66,7 @@ const TEXT_EXTENSIONS = new Set([
 
 const EXT_TO_LANGUAGE = {
   js: 'javascript',
+  mjs: 'javascript',
   jsx: 'javascript',
   ts: 'typescript',
   tsx: 'typescript',
@@ -105,7 +110,12 @@ const EXT_TO_LANGUAGE = {
   svg: 'xml'
 };
 
+const CHUNK_SIZE = 50;
+
 const getExtension = filename => {
+  if (filename.indexOf('.') === 0) {
+    filename = filename.slice(1);
+  }
   const parts = filename.split('.');
   return parts.length > 1 ? parts.pop().toLowerCase() : '';
 };
@@ -113,6 +123,9 @@ const getExtension = filename => {
 const isTextFile = filename => {
   const ext = getExtension(filename);
   const name = filename.toLowerCase();
+  if (!ext) {
+    return true;
+  }
   return TEXT_EXTENSIONS.has(ext) || name === 'dockerfile' || name === 'makefile';
 };
 
@@ -122,6 +135,57 @@ const getLanguage = filename => {
   if (name === 'makefile') return 'makefile';
   const ext = getExtension(filename);
   return EXT_TO_LANGUAGE[ext] || 'text';
+};
+
+const splitIntoChunks = (code, chunkSize = CHUNK_SIZE) => {
+  const lines = code.split('\n');
+  const chunks = [];
+  for (let i = 0; i < lines.length; i += chunkSize) {
+    const chunkLines = lines.slice(i, i + chunkSize);
+    const startLine = i + 1;
+    chunks.push({
+      code: chunkLines.join('\n'),
+      startLine,
+      lineCount: chunkLines.length
+    });
+  }
+  return chunks;
+};
+
+const CodeChunk = memo(({ code, language, startLine, maxLineNumber }) => {
+  const lineNumberWidth = useMemo(() => {
+    const digits = maxLineNumber.toString().length;
+    const charWidth = 8;
+    const padding = 32;
+    return Math.max(50, digits * charWidth + padding);
+  }, [maxLineNumber]);
+
+  return (
+    <div className={style.highlighter} style={{ '--line-number-width': `${lineNumberWidth}px` }}>
+      <SyntaxHighlighter language={language} style={vs} showLineNumbers startingLineNumber={startLine} wrapLongLines>
+        {code}
+      </SyntaxHighlighter>
+    </div>
+  );
+});
+
+const VirtualizedCode = ({ code, language }) => {
+  const chunks = useMemo(() => splitIntoChunks(code), [code]);
+  const maxLineNumber = useMemo(() => {
+    const lines = code.split('\n');
+    return lines.length;
+  }, [code]);
+
+  return (
+    <Virtuoso
+      style={{ height: '100%', width: '100%' }}
+      totalCount={chunks.length}
+      itemContent={index => {
+        const chunk = chunks[index];
+        return <CodeChunk code={chunk.code} language={language} startLine={chunk.startLine} maxLineNumber={maxLineNumber} />;
+      }}
+    />
+  );
 };
 
 const CodeReview = withLocale(({ data, getFile, ...props }) => {
@@ -154,9 +218,7 @@ const CodeReview = withLocale(({ data, getFile, ...props }) => {
         loading={<Spin className={style.loading} tip={formatMessage({ id: 'loadingText' })} />}
         render={({ data }) =>
           isText ? (
-            <SyntaxHighlighter language={language} style={vs} showLineNumbers className={style.highlighter}>
-              {data || ''}
-            </SyntaxHighlighter>
+            <VirtualizedCode code={data || ''} language={language} />
           ) : (
             <Flex vertical align="center" justify="center" flex={1}>
               <FilePreview src={data} filename={selectedFile.name} />
@@ -172,7 +234,7 @@ const CodeReview = withLocale(({ data, getFile, ...props }) => {
       <Splitter style={{ flex: 1 }}>
         <Splitter.Pane min={200} defaultSize={300}>
           <div className={style.sidebar}>
-            <FileSystemView {...props} data={data} onFileClick={setSelectedFile} />
+            <FileSystemView data={data} onFileClick={setSelectedFile} selectedPath={selectedFile?.path} />
           </div>
         </Splitter.Pane>
         <Splitter.Pane min={400}>
