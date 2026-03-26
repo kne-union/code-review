@@ -1,7 +1,7 @@
 {
   "name": "@kne/code-review",
   "version": "0.1.0",
-  "description": "用于code review",
+  "description": "一个用于代码审查场景的 React 组件，提供文件树导航和代码预览功能，支持语法高亮、虚拟滚动和多格式文件预览",
   "syntax": {
     "esmodules": true
   },
@@ -46,7 +46,20 @@
     "type": "git",
     "url": "git+https://github.com/kne-union/code-review.git"
   },
-  "keywords": [],
+  "keywords": [
+    "react",
+    "react-component",
+    "code-review",
+    "file-browser",
+    "file-tree",
+    "syntax-highlighting",
+    "virtual-scroll",
+    "antd",
+    "file-viewer",
+    "i18n",
+    "code-viewer",
+    "tree-view"
+  ],
   "author": "linzp",
   "license": "ISC",
   "bugs": {
