@@ -1,0 +1,25 @@
+{
+  "isFull": false,
+  "list": [
+    {
+      "title": "本地文件夹浏览",
+      "description": "使用 File System Access API 选择本地文件夹，浏览目录结构并预览文件内容",
+      "code": "./base.js",
+      "scope": [
+        {
+          "name": "_CodeReview",
+          "packageName": "@kne/current-lib_code-review",
+          "importStatement": "import * as _CodeReview from \"@kne/code-review\""
+        },
+        {
+          "packageName": "@kne/current-lib_code-review/dist/index.css",
+          "importStatement": "import \"@kne/code-review\/dist/index.css\""
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    }
+  ]
+}
