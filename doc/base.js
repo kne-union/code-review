@@ -34,7 +34,7 @@ const BaseExample = () => {
         const keys = await collectKeys(handle);
         for (const name of keys) {
           if (name === 'node_modules') continue;
-          const path = parentPath ? `${parentPath}/${name}` : name;
+          const path = parentPath ? parentPath + '/' + name : name;
           let isDirectory = false;
           try {
             const subDirHandle = await handle.getDirectoryHandle(name);
