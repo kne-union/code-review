@@ -50,6 +50,7 @@ export const TEXT_EXTENSIONS = new Set([
   'svg'
 ]);
 
+// 文件扩展名到语言的映射
 export const EXT_TO_LANGUAGE = {
   js: 'javascript',
   mjs: 'javascript',
@@ -94,6 +95,64 @@ export const EXT_TO_LANGUAGE = {
   log: 'text',
   csv: 'text',
   svg: 'xml'
+};
+
+// Shiki 高亮主题
+export const SHIKI_THEME = 'github-light';
+
+// Shiki 支持的语言列表（用于预加载）
+export const SHIKI_LANGUAGES = [
+  'javascript',
+  'typescript',
+  'jsx',
+  'tsx',
+  'json',
+  'css',
+  'scss',
+  'less',
+  'html',
+  'vue',
+  'python',
+  'java',
+  'go',
+  'rust',
+  'markdown',
+  'yaml',
+  'xml',
+  'bash',
+  'sql',
+  'graphql',
+  'c',
+  'cpp',
+  'ruby',
+  'php',
+  'swift',
+  'kotlin',
+  'scala',
+  'lua',
+  'r',
+  'perl',
+  'dart',
+  'svelte',
+  'toml',
+  'ini',
+  'docker',
+  'text'
+];
+
+// 语言别名映射（用于规范化语言名称）
+export const LANGUAGE_ALIASES = {
+  js: 'javascript',
+  mjs: 'javascript',
+  ts: 'typescript',
+  dockerfile: 'docker',
+  yml: 'yaml',
+  sh: 'bash',
+  h: 'c',
+  log: 'text',
+  csv: 'text',
+  svg: 'xml',
+  txt: 'text'
 };
 
 export const CHUNK_SIZE = 50;

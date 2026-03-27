@@ -4,6 +4,7 @@
   flex-direction: column;
   flex: 1;
   background: #fafbfc;
+  position: relative;
 
   :global {
     .ant-splitter > .ant-splitter-bar .ant-splitter-bar-dragger::before {
@@ -36,10 +37,10 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   padding: 12px 12px 12px 0;
+  position: relative;
 
-  pre {
+  > pre {
     margin: 0 !important;
     padding: 0 !important;
     overflow: visible !important;
@@ -47,11 +48,119 @@
   }
 }
 
-.loading {
-  flex: 1;
+.preview {
+  padding: 12px;
+  background: #ffffff;
+  margin-left: 12px;
+
+  &.supports-switch {
+    padding-top: 40px;
+  }
+}
+
+.preview-switch {
+  position: absolute;
+  top: 20px;
+  right: 32px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 2px;
+  backdrop-filter: blur(8px);
+
+  :global {
+    .ant-segmented {
+      background: transparent;
+      border-radius: 10px;
+    }
+
+    .ant-segmented-item {
+      padding: 2px 8px;
+      font-size: 12px;
+      border-radius: 10px !important;
+      transition: all 0.2s ease;
+      min-height: 20px;
+    }
+
+    .ant-segmented-item-selected {
+      background: #ffffff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+      border-radius: 10px !important;
+    }
+
+    .ant-segmented-thumb {
+      border-radius: 10px !important;
+    }
+
+    .ant-segmented-item-label {
+      border-radius: 10px !important;
+      font-size: 12px;
+    }
+
+    .anticon {
+      font-size: 12px;
+    }
+  }
+}
+
+.loading-placeholder {
+  padding: 12px;
+  color: #999;
+}
+
+.shiki-container {
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  background: #ffffff;
+}
+
+.shiki-content {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  background: #ffffff;
+}
+
+.line-numbers {
+  flex-shrink: 0;
+  min-width: var(--line-number-width, 50px);
+  text-align: right;
+  background: #fafbfc;
+  border-right: 1px solid #e1e4e8;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.line-number {
+  display: block;
+  padding: 0 16px;
+  color: #8c959f;
+  font-size: 12px;
+  line-height: 1.6;
+  height: 20.8px;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+}
+
+.code-content {
+  flex: 1;
+  background: #ffffff;
+  padding: 0 12px;
+
+  :global(pre) {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+
+  :global(code) {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
 }
 
 .highlighter {
@@ -61,6 +170,7 @@
     margin: 0 !important;
     border-radius: 0 !important;
     background: #ffffff !important;
+    padding: 12px 0 !important;
   }
 
   :global(.linenumber) {

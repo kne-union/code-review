@@ -183,12 +183,144 @@ render(<BaseExample />);
 
 ```
 
+- Ref 方法
+- 通过 ref 获取当前选中的文件信息、代码选择区域行列号，以及内容容器元素
+- _CodeReview(@kne/current-lib_code-review)[import * as _CodeReview from "@kne/code-review"],(@kne/current-lib_code-review/dist/index.css),antd(antd),mockData(./doc/mockData.js)
+
+```jsx
+const { default: CodeReview } = _CodeReview;
+const { useState, useRef, useCallback } = React;
+const { Card, Descriptions, Button, Space, message, Alert } = antd;
+const { mockFileData, mockFiles } = mockData;
+
+const RefMethodsExample = () => {
+  const codeReviewRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [selection, setSelection] = useState(null);
+
+  const getFile = useCallback(async (filePath) => {
+    const content = mockFiles[filePath];
+    if (content) {
+      return new File([content], filePath.split('/').pop(), {
+        type: 'text/plain'
+      });
+    }
+    throw new Error('File not found');
+  }, []);
+
+  const handleGetSelectedFile = () => {
+    if (!codeReviewRef.current) {
+      message.warning('组件未就绪');
+      return;
+    }
+    const file = codeReviewRef.current.getSelectedFile();
+    if (file) {
+      setSelectedFile(file);
+      message.success(&#96;已获取选中文件: ${file.name}&#96;);
+    } else {
+      message.info('当前没有选中任何文件');
+    }
+  };
+
+  const handleGetSelection = () => {
+    if (!codeReviewRef.current) {
+      message.warning('组件未就绪');
+      return;
+    }
+    const sel = codeReviewRef.current.getSelection();
+    if (sel) {
+      setSelection(sel);
+      message.success('已获取选中区域信息');
+    } else {
+      message.info('当前没有选中任何代码区域');
+    }
+  };
+
+  const handleGetContentElement = () => {
+    if (!codeReviewRef.current) {
+      message.warning('组件未就绪');
+      return;
+    }
+    const element = codeReviewRef.current.getContentElement();
+    if (element) {
+      message.success(&#96;已获取内容容器元素，宽度: ${element.offsetWidth}px&#96;);
+    } else {
+      message.warning('内容容器元素不存在');
+    }
+  };
+
+  return (
+    <Space direction="vertical" style={{ width: '100%' }} size="large">
+      <Alert
+        message="使用说明"
+        description="点击左侧文件树选择文件，在代码区域选择文本，然后使用下方按钮获取相关信息。"
+        type="info"
+        showIcon
+      />
+      
+      <Space wrap>
+        <Button type="primary" onClick={handleGetSelectedFile}>
+          获取选中文件
+        </Button>
+        <Button onClick={handleGetSelection}>
+          获取代码选择区域
+        </Button>
+        <Button onClick={handleGetContentElement}>
+          获取内容容器
+        </Button>
+      </Space>
+
+      {selectedFile && (
+        <Card title="当前选中文件" size="small">
+          <Descriptions column={1} size="small">
+            <Descriptions.Item label="文件名">{selectedFile.name}</Descriptions.Item>
+            <Descriptions.Item label="路径">{selectedFile.path}</Descriptions.Item>
+          </Descriptions>
+        </Card>
+      )}
+
+      {selection && (
+        <Card title="代码选择区域" size="small">
+          <Descriptions column={2} size="small">
+            <Descriptions.Item label="起始行">{selection.startLine}</Descriptions.Item>
+            <Descriptions.Item label="起始列">{selection.startColumn}</Descriptions.Item>
+            <Descriptions.Item label="结束行">{selection.endLine}</Descriptions.Item>
+            <Descriptions.Item label="结束列">{selection.endColumn}</Descriptions.Item>
+          </Descriptions>
+        </Card>
+      )}
+
+      <div style={{ height: 500, border: '1px solid #f0f0f0' }}>
+        <CodeReview 
+          ref={codeReviewRef} 
+          data={mockFileData} 
+          getFile={getFile} 
+        />
+      </div>
+    </Space>
+  );
+};
+
+render(<RefMethodsExample />);
+
+```
+
 ### API
 
 | 属性 | 类型 | 默认值 | 描述 |
 |------|------|-------|------|
 | data | `FileItem[]` | `[]` | 文件目录结构数据 |
 | getFile | `(filePath: string) => Promise<File>` | - | 根据文件路径获取文件对象的函数 |
+
+### Ref 方法
+
+通过 `ref` 可以访问以下方法：
+
+| 方法名 | 返回类型 | 描述 |
+|--------|----------|------|
+| getSelectedFile() | `{ path: string, name: string } \| null` | 获取当前选择的文件信息 |
+| getSelection() | `{ startLine: number, startColumn: number, endLine: number, endColumn: number } \| null` | 获取当前选中的行列号 |
+| getContentElement() | `HTMLElement \| null` | 获取代码内容容器元素 |
 
 ### FileItem
 

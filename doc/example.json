@@ -42,6 +42,29 @@
           "packageName": "antd"
         }
       ]
+    },
+    {
+      "title": "Ref 方法",
+      "description": "通过 ref 获取当前选中的文件信息、代码选择区域行列号，以及内容容器元素",
+      "code": "./ref-methods.js",
+      "scope": [
+        {
+          "name": "_CodeReview",
+          "packageName": "@kne/current-lib_code-review",
+          "importStatement": "import * as _CodeReview from \"@kne/code-review\""
+        },
+        {
+          "packageName": "@kne/current-lib_code-review/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        },
+        {
+          "name": "mockData",
+          "packageName": "./doc/mockData.js"
+        }
+      ]
     }
   ]
 }
