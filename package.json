@@ -103,9 +103,10 @@
   "dependencies": {
     "@kne/file-system-view": "^1.0.1",
     "@kne/react-fetch": "^1.5.5",
-    "@kne/react-file": "^0.1.35",
+    "@kne/react-file": "^0.1.36",
     "@kne/react-intl": "^0.1.9",
+    "classnames": "^2.5.1",
     "react-virtuoso": "^4.18.3",
-    "shiki": "^3.2.1"
+    "shiki": "^4.0.2"
   }
 }
