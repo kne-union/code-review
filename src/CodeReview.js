@@ -6,7 +6,7 @@ import Fetch from '@kne/react-fetch';
 import { FilePreview } from '@kne/react-file';
 import VirtualizedCode from './VirtualizedCode';
 import withLocale from './withLocale';
-import { isTextFile, getLanguage } from './utils';
+import { isTextFile, isTextFileByContent, getLanguage } from './utils';
 import style from './style.module.scss';
 import '@kne/react-file/dist/index.css';
 import '@kne/file-system-view/dist/index.css';
@@ -23,7 +23,7 @@ const CodeReview = withLocale(({ data, getFile, ...props }) => {
         </Flex>
       );
     }
-    const isText = isTextFile(selectedFile.name);
+    const textFileCheck = isTextFile(selectedFile.name);
     const language = getLanguage(selectedFile.name);
 
     return (
@@ -32,19 +32,27 @@ const CodeReview = withLocale(({ data, getFile, ...props }) => {
         params={{ filePath: selectedFile.path }}
         loader={async ({ params }) => {
           const file = await getFile(params.filePath);
+
+          // 如果扩展名在白名单中，直接作为文本处理
+          if (textFileCheck === true) {
+            return { content: await file.text(), isText: true, file };
+          }
+
+          // 如果扩展名不在白名单中或没有扩展名，使用 TextDecoder 检测
+          const isText = await isTextFileByContent(file);
           if (isText) {
-            return await file.text();
+            return { content: await file.text(), isText: true, file };
           } else {
-            return URL.createObjectURL(file);
+            return { content: URL.createObjectURL(file), isText: false, file };
           }
         }}
         loading={<Spin className={style.loading} tip={formatMessage({ id: 'loadingText' })} />}
         render={({ data }) =>
-          isText ? (
-            <VirtualizedCode code={data || ''} language={language} />
+          data.isText ? (
+            <VirtualizedCode code={data.content || ''} language={language} />
           ) : (
             <Flex vertical align="center" justify="center" flex={1}>
-              <FilePreview src={data} filename={selectedFile.name} />
+              <FilePreview src={data.content} filename={selectedFile.name} />
             </Flex>
           )
         }

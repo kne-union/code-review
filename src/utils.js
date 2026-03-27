@@ -12,9 +12,35 @@ export const isTextFile = filename => {
   const ext = getExtension(filename);
   const name = filename.toLowerCase();
   if (!ext) {
+    return null; // 返回 null 表示未知类型，需要进一步检测
+  }
+  if (TEXT_EXTENSIONS.has(ext) || name === 'dockerfile' || name === 'makefile') {
     return true;
   }
-  return TEXT_EXTENSIONS.has(ext) || name === 'dockerfile' || name === 'makefile';
+  return null; // 不在白名单中，返回 null 表示需要进一步检测
+};
+
+export const isTextFileByContent = async file => {
+  try {
+    // 只读取前 512 字节进行检测，提高性能
+    const chunk = file.slice(0, 512);
+    const buffer = await chunk.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+
+    // 检查是否包含空字节，这是二进制文件的常见特征
+    for (let i = 0; i < bytes.length; i++) {
+      if (bytes[i] === 0) {
+        return false;
+      }
+    }
+
+    // 尝试使用 TextDecoder 解码
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+    decoder.decode(buffer);
+    return true;
+  } catch (error) {
+    return false;
+  }
 };
 
 export const getLanguage = filename => {
