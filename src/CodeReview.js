@@ -131,7 +131,7 @@ const CodeReview = withLocale(
                 />
               </div>
             )}
-            <div className={style.content} ref={contentRef}>
+            <div className={style['right-content']} ref={contentRef}>
               {renderContent()}
             </div>
           </Splitter.Pane>

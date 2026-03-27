@@ -1,6 +1,6 @@
 {
   "name": "@kne/code-review",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "一个用于代码审查场景的 React 组件，提供文件树导航和代码预览功能，支持语法高亮、虚拟滚动和多格式文件预览",
   "syntax": {
     "esmodules": true
