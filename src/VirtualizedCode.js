@@ -2,6 +2,7 @@ import { useMemo, useRef, useCallback } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import CodeChunk from './CodeChunk';
 import { splitIntoChunks } from './utils';
+import style from './style.module.scss';
 
 const VirtualizedCode = ({ code, language, onSelectionChange }) => {
   const chunks = useMemo(() => splitIntoChunks(code), [code]);
@@ -106,7 +107,7 @@ const VirtualizedCode = ({ code, language, onSelectionChange }) => {
   }, [onSelectionChange]);
 
   return (
-    <div ref={containerRef} style={{ height: '100%', width: '100%' }} onMouseUp={handleSelectionChange} onKeyUp={handleSelectionChange}>
+    <div ref={containerRef} className={style['virtuoso-container']} style={{ height: '100%', width: '100%' }} onMouseUp={handleSelectionChange} onKeyUp={handleSelectionChange}>
       <Virtuoso
         style={{ height: '100%', width: '100%' }}
         totalCount={chunks.length}
