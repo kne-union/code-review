@@ -46,7 +46,7 @@ const CodeReview = withLocale(({ data, getFile, ...props }) => {
             return { content: URL.createObjectURL(file), isText: false, file };
           }
         }}
-        loading={<Spin className={style.loading} tip={formatMessage({ id: 'loadingText' })} />}
+        loading={<Spin className={style.loading} description={formatMessage({ id: 'loadingText' })} />}
         render={({ data }) =>
           data.isText ? (
             <VirtualizedCode code={data.content || ''} language={language} />
