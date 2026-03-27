@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useImperativeHandle, forwardRef, useRef } from 'react';
 import { useIntl } from '@kne/react-intl';
 import { Splitter, Empty, Spin, Flex } from 'antd';
 import FileSystemView from '@kne/file-system-view';
@@ -11,69 +11,97 @@ import style from './style.module.scss';
 import '@kne/react-file/dist/index.css';
 import '@kne/file-system-view/dist/index.css';
 
-const CodeReview = withLocale(({ data, getFile, ...props }) => {
-  const { formatMessage } = useIntl();
-  const [selectedFile, setSelectedFile] = useState(null);
+const CodeReview = withLocale(
+  forwardRef(({ data, getFile, ...props }, ref) => {
+    const { formatMessage } = useIntl();
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [selection, setSelection] = useState(null);
+    const contentRef = useRef(null);
 
-  const renderContent = () => {
-    if (!selectedFile) {
+    useImperativeHandle(ref, () => ({
+      /**
+       * 获取当前选择的文件信息
+       * @returns {{ path: string, name: string } | null}
+       */
+      getSelectedFile: () => selectedFile,
+      /**
+       * 获取当前选中的行列号
+       * @returns {{ startLine: number, startColumn: number, endLine: number, endColumn: number } | null}
+       */
+      getSelection: () => selection,
+      /**
+       * 获取代码内容容器元素
+       * @returns {HTMLElement | null}
+       */
+      getContentElement: () => contentRef.current
+    }));
+
+    const renderContent = () => {
+      if (!selectedFile) {
+        return (
+          <Flex vertical align="center" justify="center" flex={1}>
+            <Empty description={formatMessage({ id: 'selectFile' })} />
+          </Flex>
+        );
+      }
+      const textFileCheck = isTextFile(selectedFile.name);
+      const language = getLanguage(selectedFile.name);
+
+      const handleSelectionChange = newSelection => {
+        setSelection(newSelection);
+      };
+
       return (
-        <Flex vertical align="center" justify="center" flex={1}>
-          <Empty description={formatMessage({ id: 'selectFile' })} />
-        </Flex>
+        <Fetch
+          key={selectedFile.path}
+          params={{ filePath: selectedFile.path }}
+          loader={async ({ params }) => {
+            const file = await getFile(params.filePath);
+
+            // 如果扩展名在白名单中，直接作为文本处理
+            if (textFileCheck === true) {
+              return { content: await file.text(), isText: true, file };
+            }
+
+            // 如果扩展名不在白名单中或没有扩展名，使用 TextDecoder 检测
+            const isText = await isTextFileByContent(file);
+            if (isText) {
+              return { content: await file.text(), isText: true, file };
+            } else {
+              return { content: URL.createObjectURL(file), isText: false, file };
+            }
+          }}
+          loading={<Spin className={style.loading} description={formatMessage({ id: 'loadingText' })} />}
+          render={({ data }) =>
+            data.isText ? (
+              <VirtualizedCode code={data.content || ''} language={language} onSelectionChange={handleSelectionChange} />
+            ) : (
+              <Flex vertical align="center" justify="center" flex={1}>
+                <FilePreview src={data.content} filename={selectedFile.name} />
+              </Flex>
+            )
+          }
+        />
       );
-    }
-    const textFileCheck = isTextFile(selectedFile.name);
-    const language = getLanguage(selectedFile.name);
+    };
 
     return (
-      <Fetch
-        key={selectedFile.path}
-        params={{ filePath: selectedFile.path }}
-        loader={async ({ params }) => {
-          const file = await getFile(params.filePath);
-
-          // 如果扩展名在白名单中，直接作为文本处理
-          if (textFileCheck === true) {
-            return { content: await file.text(), isText: true, file };
-          }
-
-          // 如果扩展名不在白名单中或没有扩展名，使用 TextDecoder 检测
-          const isText = await isTextFileByContent(file);
-          if (isText) {
-            return { content: await file.text(), isText: true, file };
-          } else {
-            return { content: URL.createObjectURL(file), isText: false, file };
-          }
-        }}
-        loading={<Spin className={style.loading} description={formatMessage({ id: 'loadingText' })} />}
-        render={({ data }) =>
-          data.isText ? (
-            <VirtualizedCode code={data.content || ''} language={language} />
-          ) : (
-            <Flex vertical align="center" justify="center" flex={1}>
-              <FilePreview src={data.content} filename={selectedFile.name} />
-            </Flex>
-          )
-        }
-      />
+      <div className={style.container}>
+        <Splitter style={{ flex: 1 }}>
+          <Splitter.Pane min={200} defaultSize={300}>
+            <div className={style.sidebar}>
+              <FileSystemView data={data} onFileClick={setSelectedFile} selectedPath={selectedFile?.path} />
+            </div>
+          </Splitter.Pane>
+          <Splitter.Pane min={400}>
+            <div className={style.content} ref={contentRef}>
+              {renderContent()}
+            </div>
+          </Splitter.Pane>
+        </Splitter>
+      </div>
     );
-  };
-
-  return (
-    <div className={style.container}>
-      <Splitter style={{ flex: 1 }}>
-        <Splitter.Pane min={200} defaultSize={300}>
-          <div className={style.sidebar}>
-            <FileSystemView data={data} onFileClick={setSelectedFile} selectedPath={selectedFile?.path} />
-          </div>
-        </Splitter.Pane>
-        <Splitter.Pane min={400}>
-          <div className={style.content}>{renderContent()}</div>
-        </Splitter.Pane>
-      </Splitter>
-    </div>
-  );
-});
+  })
+);
 
 export default CodeReview;

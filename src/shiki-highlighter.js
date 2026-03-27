@@ -63,7 +63,7 @@ export const highlightCode = async (code, language, startLine = 1) => {
             node.properties.style = 'margin:0;padding:0;background:transparent;';
           },
           line(node, lineIndex) {
-            node.properties['data-line'] = lineIndex + startLine;
+            node.properties['data-line'] = lineIndex + startLine - 1;
           }
         }
       ]
